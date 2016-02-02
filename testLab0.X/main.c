@@ -27,67 +27,114 @@ typedef enum stateTypeEnum{
 } stateType;
 
 //TODO: Use volatile variables that change within interrupts
-volatile int state=led2;
+volatile int state=led1;
+volatile int longerthan=0;
 int main() {
     SYSTEMConfigPerformance(10000000);
     enableInterrupts();
     initSwitch1();
     initLEDs();
     initTimer1();
-    //initTimer2();
-       
+    initTimer2();
+     int PrevState=0;  
     while(1)
     {
-        switch(state){
+            switch(state){
               case  led1:
                     LED1=ON;
                     LED2=OFF;
                     LED3=OFF;
+                    PrevState=1;
+                  if(PORTDbits.RD6==0)
+                  {
+                      state=debouncePress;
+                  }
                     break;
                case led2:
                     LED1=OFF;
                     LED2=ON;
                     LED3=OFF;
+                    PrevState=2;
+                 if(PORTDbits.RD6==0)
+                  {
+                      state=debouncePress;
+                  }
                     break;
                case led3:
                     LED1=OFF;
                     LED2=OFF;
                     LED3=ON;
+                    PrevState=3;
+                if(PORTDbits.RD6==0)
+                  {
+                      state=debouncePress;
+                  }
                     break;
+     
+              case debouncePress:
+                  delayMs(10);
+                  state=wait;
+                  break;
+    
+              case debounceRelease:
+                  delayMs(10);
+                  state=wait2;
+                  break;
+   
+                case wait:
+                    if(PORTDbits.RD6==0)
+                    {
+                        state=wait;
+                    }
+                    else
+                    {
+                        state=debounceRelease;
+                    }
+                    break;
+                case wait2:
+                    if (longerthan==1)
+                    {
+                        if(PrevState==1)
+                        {
+                            longerthan=0;
+                            state=led3;
+                        }
+                        else if(PrevState==2)
+                        {
+                            longerthan=0;
+                            state=led1;
+                        }
+                        else if(PrevState==3)
+                        {
+                            longerthan=0;
+                            state=led2;
+                        }
+                    }
+                    else
+                    {
+                        if(PrevState==1)
+                        {
+                            state=led2;
+                        }
+                        else if(PrevState==2)
+                        {
+                            state=led3;
+                        }
+                        else if(PrevState==3)
+                        {   
+                            state=led1;
+                        }
+                    }
+                    break;
+            }
         }
-    }
+    
     
     return 0;
-}
-
-void __ISR(_CHANGE_NOTICE_VECTOR, IPL7SRS) _CNInterrupt()
-{
-            IFS1bits.CNDIF=0;
-            PORTD;
-            
-            if(PORTDbits.RD6==1)
-            {
-                LATDbits.LATD0=1;
-            }
-            else
-            {
-                LATDbits.LATD0=0;
-            }
 }
 
 void __ISR(_TIMER_1_VECTOR, IPL7SRS) __T1Interupt()
 {
     IFS0bits.T1IF=0;        //set flag back down
-    if(state==led1)
-    {
-        state=led2;
-    }
-    else if(state==led2)
-    {
-        state=led3;
-    }
-    else if(state==led3)
-    {
-        state=led1;
-    }
+    longerthan=1;
 }

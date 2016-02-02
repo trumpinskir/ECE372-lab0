@@ -21,9 +21,24 @@ void initTimer1(){
 
 initTimer2(){
     //TODO: Initialize Timer 2.
+    TMR2=0;
+    //T2CONbits.TCKPS=7;  //timer 2 scale 256
+    //PR1=39061;
+    IFS0bits.T2IF=0;        //flag
 }
 
 delayMs(int delay){
     //TODO: Using timer 2, create a delay
-    // that is delay amount of ms.
+    // that is delay amount of 10 ms.
+    TMR2=0;
+    T2CONbits.TCKPS=7;      //prescale of 256
+    PR2=390;
+    T2CONbits.ON=1;
+    IFS0bits.T2IF=0;
+    while(IFS0bits.T2IF==0)
+    {
+        
+    }
+    T2CONbits.ON=0;
+    IFS0bits.T2IF=0;
 }
