@@ -97,16 +97,19 @@ int main() {
                         if(PrevState==1)
                         {
                             longerthan=0;
+                            TMR1=0;
                             state=led3;
                         }
                         else if(PrevState==2)
                         {
                             longerthan=0;
+                            TMR1=0;
                             state=led1;
                         }
                         else if(PrevState==3)
                         {
                             longerthan=0;
+                            TMR1=0;
                             state=led2;
                         }
                     }
@@ -114,14 +117,20 @@ int main() {
                     {
                         if(PrevState==1)
                         {
+                            longerthan=0;
+                            TMR1=0;
                             state=led2;
                         }
                         else if(PrevState==2)
                         {
+                            longerthan=0;
+                            TMR1=0;
                             state=led3;
                         }
                         else if(PrevState==3)
                         {   
+                            longerthan=0;
+                            TMR1=0;
                             state=led1;
                         }
                     }
